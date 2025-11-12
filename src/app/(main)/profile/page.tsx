@@ -110,7 +110,7 @@ export default function Page() {
             <h3 className="mb-1 text-heading-6 font-bold text-dark dark:text-white">
               {data?.name}
             </h3>
-            <p className="font-medium">IT Solutions Worldwide</p>
+            <p className="font-medium">IT Solutions Hub 2010</p>
             <div className="mx-auto mb-5.5 mt-5 grid max-w-[370px] grid-cols-3 rounded-[5px] border border-stroke py-[9px] shadow-1 dark:border-dark-3 dark:bg-dark-2 dark:shadow-card">
               <div className="flex flex-col items-center justify-center gap-1 border-r border-stroke px-4 dark:border-dark-3 xsm:flex-row">
                 <span className="font-medium text-dark dark:text-white">
@@ -137,7 +137,7 @@ export default function Page() {
                 About Us
               </h4>
               <p className="mt-4">
-                IT Solutions Worldwide is a leading company that provides the best-updated solutions to a comprehensive range of industries. With X years of experience, we aim to implement simple and innovative tech solutions to help achieve businesses greater success with greater efficiency. With a proven success record, we optimize businesses through supply chain management, IT support, digital marketing services, and operational excellence. We help modernize businesses with our best technical professionals available.
+                IT Solutions Hub 2010 is a leading company that provides the best-updated solutions to a comprehensive range of industries. With X years of experience, we aim to implement simple and innovative tech solutions to help achieve businesses greater success with greater efficiency. With a proven success record, we optimize businesses through supply chain management, IT support, digital marketing services, and operational excellence. We help modernize businesses with our best technical professionals available.
               </p>
             </div>
 

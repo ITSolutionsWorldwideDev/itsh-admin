@@ -76,7 +76,7 @@ export default function SigninWithPassword() {
         <h1 className="mb-0.5 text-heading-5 font-bold text-dark dark:text-white">
           Admin Dashboard
         </h1>
-        <p className="font-medium">IT Solutions Worldwide</p>
+        <p className="font-medium">IT Solutions Hub 2010</p>
       </div>
 
       <InputGroup

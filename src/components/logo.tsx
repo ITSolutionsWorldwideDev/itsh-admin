@@ -1,4 +1,4 @@
-import darkLogo from "/images/logo/logo-dark.png";
+import darkLogo from "/images/logo/logo-dark.svg";
 import logo from "/images/logo/logo.png";
 import Image from "next/image";
 
@@ -6,19 +6,19 @@ export function Logo() {
   return (
     <div className="relative mx-10 h-12">
       <Image
-        src={"/images/logo/logo.png"}
+        src={"/images/logo/logo-dark.svg"}
         fill
         className="object-contain  dark:hidden"
-        alt="ITWW-Admin logo"
+        alt="ITSH-Admin logo"
         priority
         quality={100}
       />
 
       <Image
-        src={"/images/logo/logo-dark.png"}
+        src={"/images/logo/logo-dark.svg"}
         fill
         className="object-contain  hidden dark:block"
-        alt="ITWW-Admin logo"
+        alt="ITSH-Admin logo"
         priority
         quality={100}
       />

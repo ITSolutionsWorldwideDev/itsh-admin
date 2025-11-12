@@ -19,11 +19,11 @@ export default function RootLayout({ children }: PropsWithChildren) {
 
 export const metadata: Metadata = {
   title: {
-    template: "%s | IT Solutions Worldwide - Admin Panel",
-    default: "IT Solutions Worldwide - Admin Panel",
+    template: "%s | IT Solutions Hub 2010 - Admin Panel",
+    default: "IT Solutions Hub 2010 - Admin Panel",
   },
   description:
-    "IT Solutions Worldwide - Admin Panel",
+    "IT Solutions Hub 2010 - Admin Panel",
   icons: {
     icon: "/images/favicon.svg", // or /favicon.png, /icon.svg
     shortcut: "/images/favicon.svg",
