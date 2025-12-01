@@ -14,6 +14,7 @@ export default function JobInfoFormPage() {
   // const searchParams = useSearchParams();
   // const job_info_id = searchParams.get("id"); // optional ?id=123 for editing
   const [showMediaModal, setShowMediaModal] = useState(false);
+  const [error, setError] = useState("");
 
   const { token } = useAuthStore();
 
@@ -35,6 +36,7 @@ export default function JobInfoFormPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError("");
 
     // const method = job_info_id ? "PUT" : "POST";
     // const body = job_info_id ? { ...form, job_info_id: job_info_id } : form;
@@ -43,19 +45,30 @@ export default function JobInfoFormPage() {
     const body = form;
     if (!token) return;
 
-    const res = await fetch("/api/jobs-info", {
-      method,
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(body),
-    });
+    try {
 
-    if (res.ok) {
-      router.push("/jobs-info");
-    } else {
-      alert("Failed to save JobInfo");
+      const res = await fetch("/api/jobs-info", {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(body),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to save blog");
+
+      if (res.ok) {
+        router.push("/jobs-info");
+      } else {
+        alert("Failed to save JobInfo");
+      }
+
+
+    } catch (err: any) {
+      console.error('err  ==== ',err);
+      setError(err.message);
     }
     setLoading(false);
   };
@@ -66,6 +79,7 @@ export default function JobInfoFormPage() {
       <div className="grid grid-cols-1 gap-9">
         <div className="flex flex-col gap-9">
           <ShowcaseSection title="Add Job Info" className="space-y-5.5 !p-6.5">
+            {error && <p className="mb-2 text-red-500">{error}</p>}
             <form onSubmit={handleSubmit} className="space-y-4">
               <InputGroup
                 label="Title"

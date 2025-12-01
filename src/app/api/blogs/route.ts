@@ -112,8 +112,20 @@ export async function POST(req: NextRequest) {
     );
 
     return NextResponse.json(result.rows[0], { status: 201 });
-  } catch (err) {
+  } catch (err:any) {
     console.error(err);
+
+    if (err.code === "23505") {
+      return NextResponse.json(
+        {
+          error: "A blog with this slug already exists. Try changing the title.",
+          field: "slug",  // optional: frontend can highlight field
+          detail: err.detail,
+        },
+        { status: 409 } // 409 Conflict
+      );
+    }
+
     return NextResponse.json(
       { error: "Failed to create blog" },
       { status: 500 },
@@ -150,8 +162,19 @@ export async function PUT(req: NextRequest) {
     }
 
     return NextResponse.json(result.rows[0]);
-  } catch (err) {
+  } catch (err: any) {
     console.error(err);
+
+    if (err.code === "23505") {
+      return NextResponse.json(
+        {
+          error: "A blog with this slug already exists. Try changing the title.",
+          field: "slug",  // optional: frontend can highlight field
+          detail: err.detail,
+        },
+        { status: 409 } // 409 Conflict
+      );
+    }
     return NextResponse.json(
       { error: "Failed to update blog" },
       { status: 500 },

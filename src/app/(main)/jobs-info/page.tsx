@@ -78,9 +78,11 @@ export default function JobInfoListPage() {
   };
 
   useEffect(() => {
+
+    if (!token) return; 
     fetchjobsInfo(currentPage);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage]);
+  }, [token,currentPage]);
 
   // ✅ Handle jobs-info delete
   const handleDelete = async (id: number) => {

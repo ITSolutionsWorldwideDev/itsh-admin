@@ -52,6 +52,7 @@ export default function EditBlogPage() {
         });
       } catch (err: any) {
         setError(err.message);
+        alert(err.error);
       } finally {
         setLoading(false);
       }

@@ -15,6 +15,7 @@ export default function BlogFormPage() {
   const router = useRouter();
 
   const [showMediaModal, setShowMediaModal] = useState(false);
+  const [error, setError] = useState("");
 
   const { token } = useAuthStore();
 
@@ -41,6 +42,7 @@ export default function BlogFormPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError("");
 
     // const method = blogId ? "PUT" : "POST";
     // const body = blogId ? { ...form, blog_id: blogId } : form;
@@ -48,20 +50,34 @@ export default function BlogFormPage() {
     const method = "POST";
     const body = form;
 
-    const res = await fetch("/api/blogs", {
-      method,
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    });
+    try {
 
-    if (res.ok) {
-      router.push("/blogs");
-    } else {
-      alert("Failed to save blog");
+      const res:any = await fetch("/api/blogs", {
+        method,
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to save blog");
+
+      if (res.ok) {
+        router.push("/blogs");
+      } else {
+        console.error('res  ==== ',res);
+        alert(res.error);
+        // alert("Failed to save blog");
+      }
+
+
+    } catch (err: any) {
+      console.error('err  ==== ',err);
+      setError(err.message);
     }
+
     setLoading(false);
   };
 
@@ -71,6 +87,7 @@ export default function BlogFormPage() {
       <div className="grid grid-cols-1 gap-9">
         <div className="flex flex-col gap-9">
           <ShowcaseSection title="Add Blog" className="space-y-5.5 !p-6.5">
+            {error && <p className="mb-2 text-red-500">{error}</p>}
             <form onSubmit={handleSubmit} className="space-y-4">
               <InputGroup
                 label="Title"
