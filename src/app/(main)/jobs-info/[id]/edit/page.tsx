@@ -58,7 +58,7 @@ export default function EditJobInfoPage() {
       }
     };
     fetchJobInfo();
-  }, [id]);
+  }, [token,id]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,

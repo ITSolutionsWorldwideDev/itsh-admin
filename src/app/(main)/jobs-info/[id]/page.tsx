@@ -36,6 +36,7 @@ export default function JobInfoViewPage() {
 
   useEffect(() => {
     if (!id) return;
+    if (!token) return;
     const fetchJobInfo = async () => {
       try {
         if (!token) return;
@@ -53,7 +54,7 @@ export default function JobInfoViewPage() {
       }
     };
     fetchJobInfo();
-  }, [id]);
+  }, [token,id]);
 
   const handleDelete = async () => {
     if (!id) return;

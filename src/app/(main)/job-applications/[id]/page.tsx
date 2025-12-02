@@ -41,6 +41,7 @@ export default function JobApplicationViewPage() {
 
   useEffect(() => {
     if (!id) return;
+    if (!token) return;
     const fetchJobApplication = async () => {
       try {
         const res = await fetch(`/api/jobs-application?id=${id}`);
@@ -53,7 +54,7 @@ export default function JobApplicationViewPage() {
       }
     };
     fetchJobApplication();
-  }, [id]);
+  }, [token,id]);
 
   const handleDelete = async () => {
     if (!id) return;

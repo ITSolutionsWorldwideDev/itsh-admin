@@ -34,6 +34,7 @@ export default function EditBlogPage() {
 
   useEffect(() => {
     if (!id) return;
+    if (!token) return;
     const fetchBlog = async () => {
       try {
         const res = await fetch(`/api/blogs?id=${id}`, {
@@ -58,7 +59,7 @@ export default function EditBlogPage() {
       }
     };
     fetchBlog();
-  }, [id]);
+  }, [token,id]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,

@@ -35,6 +35,7 @@ export default function BlogViewPage() {
 
   useEffect(() => {
     if (!id) return;
+    if (!token) return;
     const fetchBlog = async () => {
       try {
         const res = await fetch(`/api/blogs?id=${id}`, {
@@ -51,7 +52,7 @@ export default function BlogViewPage() {
       }
     };
     fetchBlog();
-  }, [id]);
+  }, [token,id]);
 
   const handleDelete = async () => {
     if (!id) return;
