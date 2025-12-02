@@ -121,16 +121,22 @@ export default function JobInfoFormPage() {
               /> */}
 
               {/* Featured Image Picker */}
+              {/* <img
+                      src={form.pdf_url}
+                      alt="Featured"
+                      className="rounded border object-cover"
+                    /> */}
               <div>
                 <label className="mb-2 block font-medium">Featured Image</label>
 
                 {form.pdf_url ? (
-                  <div className="relative w-40">
-                    <img
-                      src={form.pdf_url}
-                      alt="Featured"
-                      className="rounded border object-cover"
-                    />
+                  <div className="relative w-40 rounded border bg-gray-50 p-2 hover:shadow-md">
+                    <div className="flex aspect-square items-center justify-center bg-gray-200 text-center text-sm text-gray-600">
+                      <a target="_blank" href={form.pdf_url}>
+                        application/pdf <br />
+                        {form.title}
+                      </a>
+                    </div>
                     <button
                       type="button"
                       onClick={() => setForm({ ...form, pdf_url: "" })}
