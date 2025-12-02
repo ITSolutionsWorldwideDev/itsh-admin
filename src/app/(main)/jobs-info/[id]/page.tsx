@@ -123,6 +123,29 @@ export default function JobInfoViewPage() {
                 value={new Date(jobInfo.created_at).toLocaleDateString()}
               />
 
+              {/* <Image
+                  src={jobInfo.pdf_url}
+                  alt={jobInfo.title}
+                  width={400}
+                  height={400}
+                  className="mb-4 w-full rounded-lg"
+                /> */}
+
+              {jobInfo.pdf_url?.length && (
+                <>
+                  <label className="mb-2 block font-medium">
+                    Featured Image
+                  </label>
+                  <div className="relative w-40 rounded border bg-gray-50 p-2 hover:shadow-md">
+                    <div className="flex aspect-square items-center text-center justify-center bg-gray-200 text-sm text-gray-600">
+                      <a target="_blank" href={jobInfo.pdf_url}>
+                        application/pdf <br />{jobInfo.title}
+                      </a>
+                    </div>
+                  </div>
+                </>
+              )}
+
               <div className="mb-4 text-right">
                 <div className="flex gap-2">
                   <Link
@@ -139,16 +162,6 @@ export default function JobInfoViewPage() {
                   </button>
                 </div>
               </div>
-
-              {jobInfo.pdf_url?.length && (
-                <Image
-                  src={jobInfo.pdf_url}
-                  alt={jobInfo.title}
-                  width={400}
-                  height={400}
-                  className="mb-4 w-full rounded-lg"
-                />
-              )}
             </ShowcaseSection>
           </div>
         </div>
