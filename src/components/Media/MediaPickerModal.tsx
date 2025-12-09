@@ -4,7 +4,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { useAuthStore } from "@/store/useAuthStore"; 
+import { useAuthStore } from "@/store/useAuthStore";
 
 interface MediaItem {
   media_id: number;
@@ -17,7 +17,7 @@ interface MediaItem {
 interface MediaPickerModalProps {
   open: boolean;
   multiple?: boolean;
-  module_ref?:string;
+  module_ref?: string;
   onClose: () => void;
   onSelect: (selected: MediaItem[]) => void;
 }
@@ -25,7 +25,7 @@ interface MediaPickerModalProps {
 export default function MediaPickerModal({
   open,
   multiple = false,
-  module_ref="media",
+  module_ref = "media",
   onClose,
   onSelect,
 }: MediaPickerModalProps) {
@@ -49,7 +49,7 @@ export default function MediaPickerModal({
 
   useEffect(() => {
     if (open) fetchMedia();
-  }, [token,open]);
+  }, [token, open]);
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -80,7 +80,7 @@ export default function MediaPickerModal({
       setSelected((prev) =>
         prev.find((i) => i.media_id === item.media_id)
           ? prev.filter((i) => i.media_id !== item.media_id)
-          : [...prev, item]
+          : [...prev, item],
       );
     } else {
       setSelected([item]);
@@ -90,6 +90,21 @@ export default function MediaPickerModal({
   const confirmSelection = () => {
     onSelect(selected);
     onClose();
+  };
+
+  const formatFileName = (name: string) => {
+    // remove prefix before first hyphen
+    let cleaned = name.split("-").slice(1).join("-");
+
+    // remove underscores
+    cleaned = cleaned.replace(/_/g, " ");
+
+    // limit to 50 chars
+    if (cleaned.length > 50) {
+      cleaned = cleaned.slice(0, 50) + "...";
+    }
+
+    return cleaned;
   };
 
   if (!open) return null;
@@ -116,32 +131,36 @@ export default function MediaPickerModal({
         </div>
 
         {/* Media Grid */}
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 overflow-y-auto max-h-[60vh]">
-          {media.map((item) => (
-            <div
-              key={item.media_id}
-              onClick={() => toggleSelect(item)}
-              className={`relative cursor-pointer rounded border-2 ${
-                selected.find((i) => i.media_id === item.media_id)
-                  ? "border-primary"
-                  : "border-transparent"
-              }`}
-            >
-              {item.file_type.startsWith("image/") ? (
-                <Image
-                  src={item.file_path}
-                  alt={item.file_name}
-                  width={200}
-                  height={200}
-                  className="aspect-square w-full rounded object-cover"
-                />
-              ) : (
-                <div className="flex aspect-square items-center justify-center bg-gray-200 text-sm text-gray-600">
-                  {item.file_type}
-                </div>
-              )}
-            </div>
-          ))}
+        <div className="grid max-h-[60vh] grid-cols-2 gap-3 overflow-y-auto sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+          {media.map((item) => {
+            const displayName = formatFileName(item.file_name);
+            return (
+              <div
+                key={item.media_id}
+                onClick={() => toggleSelect(item)}
+                className={`relative cursor-pointer rounded border-2 ${
+                  selected.find((i) => i.media_id === item.media_id)
+                    ? "border-primary"
+                    : "border-transparent"
+                }`}
+              >
+                {item.file_type.startsWith("image/") ? (
+                  <Image
+                    src={item.file_path}
+                    alt={item.file_name}
+                    width={200}
+                    height={200}
+                    className="aspect-square w-full rounded object-cover"
+                  />
+                ) : (
+                  <div className="flex aspect-square items-center justify-center break-words bg-gray-200 p-2 text-center text-xs text-gray-700">
+                    {item.file_type} <br />
+                    {displayName}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
 
         {/* Footer */}

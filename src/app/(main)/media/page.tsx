@@ -3,7 +3,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { useAuthStore } from "@/store/useAuthStore"; 
+import { useAuthStore } from "@/store/useAuthStore";
 
 interface MediaItem {
   media_id: number;
@@ -16,7 +16,6 @@ interface MediaItem {
 export default function MediaLibrary() {
   const [media, setMedia] = useState<MediaItem[]>([]);
   const [uploading, setUploading] = useState(false);
-  const [selected, setSelected] = useState<MediaItem | null>(null);
 
   const { token } = useAuthStore();
 
@@ -72,6 +71,21 @@ export default function MediaLibrary() {
     await fetchMedia();
   };
 
+  const formatFileName = (name: string) => {
+    // remove prefix before first hyphen
+    let cleaned = name.split("-").slice(1).join("-");
+
+    // remove underscores
+    cleaned = cleaned.replace(/_/g, " ");
+
+    // limit to 50 chars
+    if (cleaned.length > 50) {
+      cleaned = cleaned.slice(0, 50) + "...";
+    }
+
+    return cleaned;
+  };
+
   return (
     <div className="p-6">
       <h1 className="mb-6 text-2xl font-bold">Media Library</h1>
@@ -84,33 +98,38 @@ export default function MediaLibrary() {
       </div>
 
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-        {media.map((item) => (
-          <div
-            key={item.media_id}
-            className="relative rounded border bg-gray-50 p-2 hover:shadow-md"
-          >
-            {item.file_type.startsWith("image/") ? (
-              <Image
-                src={item.file_path}
-                alt={item.file_name}
-                width={200}
-                height={200}
-                className="aspect-square w-full rounded object-cover"
-              />
-            ) : (
-              <div className="flex aspect-square items-center justify-center bg-gray-200 text-sm text-gray-600">
-                {item.file_type}
-              </div>
-            )}
+        {media.map((item) => {
+          const displayName = formatFileName(item.file_name);
 
-            <button
-              onClick={() => handleDelete(item.media_id)}
-              className="absolute right-1 top-1 rounded bg-red-500 px-2 py-1 text-xs text-white"
+          return (
+            <div
+              key={item.media_id}
+              className="relative rounded border bg-gray-50 p-2 hover:shadow-md"
             >
-              Delete
-            </button>
-          </div>
-        ))}
+              {item.file_type.startsWith("image/") ? (
+                <Image
+                  src={item.file_path}
+                  alt={item.file_name}
+                  width={200}
+                  height={200}
+                  className="aspect-square w-full rounded object-cover"
+                />
+              ) : (
+                <div className="flex aspect-square items-center justify-center break-words bg-gray-200 p-2 text-center text-xs text-gray-700">
+                  {item.file_type} <br />
+                  {displayName}
+                </div>
+              )}
+
+              <button
+                onClick={() => handleDelete(item.media_id)}
+                className="absolute right-1 top-1 rounded bg-red-500 px-2 py-1 text-xs text-white"
+              >
+                Delete
+              </button>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
