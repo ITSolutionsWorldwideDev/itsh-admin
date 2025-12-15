@@ -9,7 +9,7 @@ export async function middleware(req: NextRequest) {
   if (
     pathname.startsWith("/api") ||
     pathname.startsWith("/_next") ||
-    pathname.startsWith("/favicon.svg")
+    pathname.startsWith("/favicon-96x96.png")
   ) {
     return NextResponse.next();
   }
@@ -18,5 +18,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.svg).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon-96x96.png).*)"],
 };

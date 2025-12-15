@@ -25,8 +25,8 @@ export const metadata: Metadata = {
   description:
     "IT Solutions Hub 2010 - Admin Panel",
   icons: {
-    icon: "/images/favicon.svg", // or /favicon.png, /icon.svg
-    shortcut: "/images/favicon.svg",
-    apple: "/images/apple-touch-icon.png",
+    icon: "/images/favicon-96x96.png", // or /favicon.png, /icon.svg
+    shortcut: "/images/favicon-96x96.png",
+    apple: "/images/favicon-96x96.png",
   },
 };
