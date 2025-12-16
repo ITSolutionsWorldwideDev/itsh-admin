@@ -183,6 +183,23 @@ export default function EditBlogPage() {
                 )}
               </div>
               {/* Media Picker Modal */}
+              
+
+              {showMediaModal && (
+                <MediaPickerModal
+                  open={showMediaModal}
+                  multiple={false}
+                  module_ref="blogs"
+                  onClose={() => setShowMediaModal(false)}
+                  onSelect={(files) => {
+                    if (files[0]) {
+                      setForm({ ...form, imageUrl: files[0].file_path });
+                    }
+                  }}
+                />
+              )}
+              
+              {/* 
               {showMediaModal && (
                 <MediaPickerModal
                   open={showMediaModal}
@@ -209,7 +226,7 @@ export default function EditBlogPage() {
                     // }
                   }}
                 />
-              )}
+              )} */}
               <label className="flex items-center gap-2">
                 <input
                   type="checkbox"
