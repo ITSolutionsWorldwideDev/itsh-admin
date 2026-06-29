@@ -65,7 +65,7 @@ export default function Signin() {
       setUser(result.user, result.token);
 
       // Redirect to home
-      router.push("/");
+      window.location.href = "/";
     } catch (err) {
       setError("Failed to sign in");
       console.error(err);
