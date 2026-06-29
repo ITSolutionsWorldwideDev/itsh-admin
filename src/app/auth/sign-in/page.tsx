@@ -27,6 +27,7 @@ export default function SignIn() {
                   alt="Logo"
                   width={176}
                   height={32}
+                  unoptimized
                 />
                 <Image
                   className="dark:hidden"
@@ -34,6 +35,7 @@ export default function SignIn() {
                   alt="Logo"
                   width={176}
                   height={32}
+                  unoptimized
                 />
               </Link>
               <p className="mb-3 text-xl font-medium text-dark dark:text-white">
@@ -56,6 +58,7 @@ export default function SignIn() {
                   alt="Logo"
                   width={176}
                   height={32}
+                  unoptimized
                 />
                 <Image
                   className="dark:hidden"
@@ -63,6 +66,7 @@ export default function SignIn() {
                   alt="Logo"
                   width={176}
                   height={32}
+                  unoptimized
                 />
               </Link>
               <p className="mb-3 text-xl font-medium text-dark dark:text-white">
@@ -78,13 +82,14 @@ export default function SignIn() {
                 fields below
               </p>
 
-              <div className="mt-31">
-                <Image
-                  src={"/images/grids/grid-02.svg"}
-                  alt="Logo"
+              <div className="mt-31 flex justify-center pb-12.5">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/images/grids/grid-02.svg"
+                  alt=""
                   width={405}
                   height={325}
-                  className="mx-auto dark:opacity-30"
+                  className="h-auto w-full max-w-[405px] opacity-70 dark:opacity-50"
                 />
               </div>
             </div>

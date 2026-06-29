@@ -19,7 +19,8 @@ export function UserInfo() {
   const [isOpen, setIsOpen] = useState(false);
   const { user, logout } = useAuthStore();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await fetch("/api/auth/sign-out", { method: "POST" });
     logout(); // clear session
     router.push("/auth/sign-in"); // redirect
   };

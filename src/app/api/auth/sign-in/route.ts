@@ -44,6 +44,16 @@ export async function POST(req: Request) {
       token,
     });
 
+    response.cookies.set({
+      name: "token",
+      value: token,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7,
+    });
+
     return response;
   } catch (err) {
     console.error(err);
