@@ -14,6 +14,7 @@ interface AuthState {
   isAuthenticated: boolean;
   hasHydrated: boolean;
   setUser: (user: User, token: string) => void;
+  syncFromSession: () => Promise<void>;
   logout: () => void;
   setHasHydrated: (state: boolean) => void;
 }
@@ -27,6 +28,34 @@ export const useAuthStore = create<AuthState>()(
       hasHydrated: false,
 
       setUser: (user, token) => set({ user, token, isAuthenticated: true }),
+
+      syncFromSession: async () => {
+        try {
+          const res = await fetch("/api/auth/session", {
+            credentials: "include",
+          });
+
+          if (res.ok) {
+            const data = await res.json();
+            set({
+              user: data.user,
+              token: data.token,
+              isAuthenticated: true,
+              hasHydrated: true,
+            });
+            return;
+          }
+        } catch {
+          // fall through
+        }
+
+        set({
+          user: null,
+          token: null,
+          isAuthenticated: false,
+          hasHydrated: true,
+        });
+      },
 
       logout: () => set({ user: null, token: null, isAuthenticated: false }),
 

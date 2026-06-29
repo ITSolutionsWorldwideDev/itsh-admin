@@ -4,7 +4,7 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET!;
 
 export interface AuthTokenPayload extends JwtPayload {
-  id: number;
+  user_id: number;
   email: string;
 }
 

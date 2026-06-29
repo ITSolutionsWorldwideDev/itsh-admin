@@ -2,15 +2,16 @@
 import "@/css/satoshi.css";
 import "@/css/style.css";
 
-import { Sidebar } from "@/components/Layouts/sidebar";
-// src/app/layout.tsx
 import type { PropsWithChildren } from "react";
 import { Metadata } from "next";
+import { Providers } from "./providers";
 
 export default function RootLayout({ children }: PropsWithChildren) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body>{children}</body>
+      <body>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }

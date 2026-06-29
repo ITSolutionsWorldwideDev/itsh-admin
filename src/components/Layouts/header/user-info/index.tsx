@@ -12,21 +12,16 @@ import Link from "next/link";
 import { useState } from "react";
 import { LogOutIcon, SettingsIcon, UserAvatar, UserIcon } from "./icons";
 import { useAuthStore } from "@/store/useAuthStore";
-import { useRouter } from "next/navigation";
 
 export function UserInfo() {
-  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const { user, logout } = useAuthStore();
 
   const handleLogout = async () => {
-    await fetch("/api/auth/sign-out", { method: "POST" });
-    logout(); // clear session
-    router.push("/auth/sign-in"); // redirect
+    await fetch("/api/auth/sign-out", { method: "POST", credentials: "include" });
+    logout();
+    window.location.href = "/auth/sign-in";
   };
-  
-
-  console.log('user ==== ',user);
 
   /* const USER = {
     name: "John Smith",

@@ -9,7 +9,7 @@ export async function POST(req: Request) {
     const { email, password } = await req.json();
 
     const result = await pool.query(
-      `SELECT user_id,email, password_hash, "firstName", "lastName" FROM users WHERE email = $1`,
+      `SELECT user_id, username, email, password_hash, "firstName", "lastName" FROM users WHERE email = $1`,
       [email],
     );
 
@@ -36,7 +36,7 @@ export async function POST(req: Request) {
       message: "Login successful",
       user: {
         id: user.user_id,
-        username: user.username,
+        username: user.username ?? user.email,
         email: user.email,
         firstName: user.firstName,
         lastName: user.lastName,

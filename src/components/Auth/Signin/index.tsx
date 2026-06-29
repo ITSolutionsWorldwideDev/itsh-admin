@@ -12,14 +12,15 @@ import { useEffect } from "react";
 
 export default function Signin() {
   const router = useRouter();
-  const { setUser } = useAuthStore();
-  const { isAuthenticated } = useAuthStore();
+  const { setUser, syncFromSession } = useAuthStore();
 
   useEffect(() => {
-    if (isAuthenticated) {
-      router.replace("/");
-    }
-  }, [isAuthenticated, router]);
+    syncFromSession().then(() => {
+      if (useAuthStore.getState().isAuthenticated) {
+        router.replace("/");
+      }
+    });
+  }, [router, syncFromSession]);
 
   const [data, setData] = useState({
     email: process.env.NEXT_PUBLIC_DEMO_USER_MAIL || "",
