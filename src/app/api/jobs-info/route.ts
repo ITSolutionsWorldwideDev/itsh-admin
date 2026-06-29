@@ -174,7 +174,6 @@ export async function PUT(req: NextRequest) {
         { status: 409 } // 409 Conflict
       );
     }
-
     return NextResponse.json(
       { error: "Failed to update jobs-info" },
       { status: 500 },

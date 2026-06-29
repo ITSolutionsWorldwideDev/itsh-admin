@@ -58,7 +58,7 @@ export default function EditJobInfoPage() {
       }
     };
     fetchJobInfo();
-  }, [token,id]);
+  }, [token, id]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -155,12 +155,12 @@ export default function EditJobInfoPage() {
               /> */}
 
               {/* Featured Image */}
-
               {/* <img
                       src={form.pdf_url}
                       alt="Featured"
                       className="rounded border object-cover"
                     /> */}
+
               <div>
                 <label className="mb-2 block font-medium">Featured Image</label>
                 {form.pdf_url ? (
@@ -171,7 +171,6 @@ export default function EditJobInfoPage() {
                         {form.title}
                       </a>
                     </div>
-
                     <button
                       type="button"
                       onClick={() => setForm({ ...form, pdf_url: "" })}
@@ -194,15 +193,17 @@ export default function EditJobInfoPage() {
               {/* Media Picker Modal */}
               {showMediaModal && (
                 <MediaPickerModal
-                  open={showMediaModal}
-                  multiple={false}
-                  module_ref="jobs_desc"
-                  onClose={() => setShowMediaModal(false)}
-                  onSelect={(files) => {
-                    if (files[0]) {
-                      setForm({ ...form, pdf_url: files[0].file_path });
-                    }
-                  }}
+                  {...({
+                    open: showMediaModal,
+                    multiple: false,
+                    module_ref: "jobs_desc",
+                    onClose: () => setShowMediaModal(false),
+                    onSelect: (files: any) => {
+                      if (files[0]) {
+                        setForm({ ...form, pdf_url: files[0].file_path });
+                      }
+                    },
+                  } as any)}
                 />
               )}
 
