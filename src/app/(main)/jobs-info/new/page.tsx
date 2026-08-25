@@ -3,16 +3,21 @@
 
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import InputGroup from "@/components/FormElements/InputGroup";
+import { TextAreaGroup } from "@/components/FormElements/InputGroup/text-area";
 import { ShowcaseSection } from "@/components/Layouts/showcase-section";
 import MediaPickerModal from "@/components/Media/MediaPickerModal";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
+import {
+  composeJobContent,
+  parseFreeformJobText,
+  EMPTY_JOB_CONTENT_FIELDS,
+  JobContentFields,
+} from "@/utils/job-content-format";
 
 export default function JobInfoFormPage() {
   const router = useRouter();
-  // const searchParams = useSearchParams();
-  // const job_info_id = searchParams.get("id"); // optional ?id=123 for editing
   const [showMediaModal, setShowMediaModal] = useState(false);
   const [error, setError] = useState("");
 
@@ -20,11 +25,21 @@ export default function JobInfoFormPage() {
 
   const [form, setForm] = useState({
     title: "",
-    content: "",
+    location: "",
+    type: "",
     pdf_url: "",
     published: false,
   });
+  const [contentFields, setContentFields] = useState<JobContentFields>(EMPTY_JOB_CONTENT_FIELDS);
+  const [quickPaste, setQuickPaste] = useState("");
+  const [fillVersion, setFillVersion] = useState(0);
   const [loading, setLoading] = useState(false);
+
+  const handleAutoFill = () => {
+    if (!quickPaste.trim()) return;
+    setContentFields(parseFreeformJobText(quickPaste));
+    setFillVersion((v) => v + 1); // textareas ko force remount karne ke liye (defaultValue uncontrolled hai)
+  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -33,22 +48,28 @@ export default function JobInfoFormPage() {
     setForm({ ...form, [name]: type === "checkbox" ? checked : value });
   };
 
+  const handleContentFieldChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { name, value } = e.target;
+    setContentFields({ ...contentFields, [name]: value });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!token) return;
+
     setLoading(true);
     setError("");
 
-    // const method = job_info_id ? "PUT" : "POST";
-    // const body = job_info_id ? { ...form, job_info_id: job_info_id } : form;
-
-    const method = "POST";
-    const body = form;
-    if (!token) return;
-
     try {
+      const body = {
+        ...form,
+        content: composeJobContent(contentFields),
+      };
 
       const res = await fetch("/api/jobs-info", {
-        method,
+        method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -59,18 +80,13 @@ export default function JobInfoFormPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to save blog");
 
-      if (res.ok) {
-        router.push("/jobs-info");
-      } else {
-        alert("Failed to save JobInfo");
-      }
-
-
+      router.push("/jobs-info");
     } catch (err: any) {
-      console.error('err  ==== ',err);
+      console.error("err  ==== ", err);
       setError(err.message);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   return (
@@ -89,6 +105,7 @@ export default function JobInfoFormPage() {
                 active
                 required
                 handleChange={handleChange}
+                value={form.title}
               />
 
               <InputGroup
@@ -99,6 +116,7 @@ export default function JobInfoFormPage() {
                 active
                 required
                 handleChange={handleChange}
+                value={form.location}
               />
 
               <InputGroup
@@ -109,23 +127,65 @@ export default function JobInfoFormPage() {
                 active
                 required
                 handleChange={handleChange}
+                value={form.type}
               />
 
-              {/* <InputGroup
-                label="PDF URL"
-                placeholder="PDF URL"
-                type="text"
-                name="pdf_url"
-                active
-                handleChange={handleChange}
-              /> */}
+              <div className="rounded-lg border border-dashed border-gray-400 p-4">
+                <TextAreaGroup
+                  label="Quick Paste (optional) — pura job description ek sath paste karo"
+                  placeholder={"About the Role\nHum ek IT Support Officer dhoond rahe hain...\n\nResponsibilities\n- User tickets resolve karna\n\nRequirements\n- 2 saal ka experience\n\nBenefits\n- ITIL certification"}
+                  name="quickPaste"
+                  defaultValue={quickPaste}
+                  handleChange={(e) => setQuickPaste(e.target.value)}
+                />
+                <button
+                  type="button"
+                  onClick={handleAutoFill}
+                  className="mt-2 rounded-md bg-primary/10 px-4 py-2 text-sm font-medium text-primary hover:bg-primary/20"
+                >
+                  Auto-Fill Fields Below
+                </button>
+                <p className="mt-1 text-xs text-gray-500">
+                  Heading apni line pe likho (About the Role / Responsibilities / Requirements / Benefits) — neeche wale fields overwrite ho jayenge, save karne se pehle review kar lena.
+                </p>
+              </div>
 
-              {/* Featured Image Picker */}
-              {/* <img
-                      src={form.pdf_url}
-                      alt="Featured"
-                      className="rounded border object-cover"
-                    /> */}
+              <TextAreaGroup
+                key={`aboutRole-${fillVersion}`}
+                label="About the Role"
+                placeholder="Role ka general description likho (paragraph mein)"
+                name="aboutRole"
+                defaultValue={contentFields.aboutRole}
+                handleChange={handleContentFieldChange}
+              />
+
+              <TextAreaGroup
+                key={`whatYoullDo-${fillVersion}`}
+                label="Key Responsibilities (har line = ek bullet point)"
+                placeholder={"User tickets resolve karna\nHardware issues troubleshoot karna\nNetwork problems handle karna"}
+                name="whatYoullDo"
+                defaultValue={contentFields.whatYoullDo}
+                handleChange={handleContentFieldChange}
+              />
+
+              <TextAreaGroup
+                key={`whatYoullBring-${fillVersion}`}
+                label="Requirements (har line = ek bullet point)"
+                placeholder={"2+ saal ka experience\nWindows aur Mac dono ka knowledge\nAchi communication skills"}
+                name="whatYoullBring"
+                defaultValue={contentFields.whatYoullBring}
+                handleChange={handleContentFieldChange}
+              />
+
+              <TextAreaGroup
+                key={`niceToHave-${fillVersion}`}
+                label="Nice to Have (har line = ek bullet point)"
+                placeholder={"ITIL certification\nNetworking background"}
+                name="niceToHave"
+                defaultValue={contentFields.niceToHave}
+                handleChange={handleContentFieldChange}
+              />
+
               <div>
                 <label className="mb-2 block font-medium">Featured Image</label>
 
@@ -159,15 +219,17 @@ export default function JobInfoFormPage() {
               {/* Media Picker Modal */}
               {showMediaModal && (
                 <MediaPickerModal
-                  open={showMediaModal}
-                  multiple={false}
-                  module_ref="jobs_desc"
-                  onClose={() => setShowMediaModal(false)}
-                  onSelect={(files) => {
-                    if (files[0]) {
-                      setForm({ ...form, pdf_url: files[0].file_path });
-                    }
-                  }}
+                  {...({
+                    open: showMediaModal,
+                    multiple: false,
+                    module_ref: "jobs_desc",
+                    onClose: () => setShowMediaModal(false),
+                    onSelect: (files: any) => {
+                      if (files[0]) {
+                        setForm({ ...form, pdf_url: files[0].file_path });
+                      }
+                    },
+                  } as any)}
                 />
               )}
 

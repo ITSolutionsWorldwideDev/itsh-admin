@@ -9,6 +9,13 @@ import { TextAreaGroup } from "@/components/FormElements/InputGroup/text-area";
 import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import MediaPickerModal from "@/components/Media/MediaPickerModal";
 import { useAuthStore } from "@/store/useAuthStore";
+import {
+  composeJobContent,
+  parseJobContent,
+  parseFreeformJobText,
+  EMPTY_JOB_CONTENT_FIELDS,
+  JobContentFields,
+} from "@/utils/job-content-format";
 
 interface JobInfoFormData {
   job_info_id: number;
@@ -23,11 +30,20 @@ export default function EditJobInfoPage() {
   const { id } = useParams();
   const router = useRouter();
   const [form, setForm] = useState<JobInfoFormData | null>(null);
+  const [contentFields, setContentFields] = useState<JobContentFields>(EMPTY_JOB_CONTENT_FIELDS);
+  const [quickPaste, setQuickPaste] = useState("");
+  const [fillVersion, setFillVersion] = useState(0);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
   const [showMediaModal, setShowMediaModal] = useState(false);
+
+  const handleAutoFill = () => {
+    if (!quickPaste.trim()) return;
+    setContentFields(parseFreeformJobText(quickPaste));
+    setFillVersion((v) => v + 1); // textareas ko force remount karne ke liye (defaultValue uncontrolled hai)
+  };
 
   const { token } = useAuthStore();
 
@@ -43,6 +59,7 @@ export default function EditJobInfoPage() {
         });
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || "Failed to load JobInfo");
+
         setForm({
           job_info_id: data.job_info_id,
           title: data.title,
@@ -51,6 +68,9 @@ export default function EditJobInfoPage() {
           pdf_url: data.pdf_url,
           published: !!data.published,
         });
+
+        // Purana markdown "content" wapas 4 fields mein todo taake edit ho sake
+        setContentFields(parseJobContent(data.content));
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -67,6 +87,13 @@ export default function EditJobInfoPage() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const handleContentFieldChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { name, value } = e.target;
+    setContentFields({ ...contentFields, [name]: value });
+  };
+
   const handleToggle = () => {
     if (!form) return;
     setForm({ ...form, published: !form.published });
@@ -80,13 +107,18 @@ export default function EditJobInfoPage() {
     setError("");
 
     try {
+      const body = {
+        ...form,
+        content: composeJobContent(contentFields),
+      };
+
       const res = await fetch("/api/jobs-info", {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(form),
+        body: JSON.stringify(body),
       });
 
       const data = await res.json();
@@ -144,22 +176,61 @@ export default function EditJobInfoPage() {
                 value={form.type}
               />
 
-              {/* <InputGroup
-                label="PDF URL"
-                placeholder="PDF URL"
-                type="text"
-                name="pdf_url"
-                active
-                handleChange={handleChange}
-                value={form.pdf_url || ""}
-              /> */}
+              <div className="rounded-lg border border-dashed border-gray-400 p-4">
+                <TextAreaGroup
+                  label="Quick Paste (optional) — pura job description ek sath paste karo"
+                  placeholder={"About the Role\nHum ek IT Support Officer dhoond rahe hain...\n\nResponsibilities\n- User tickets resolve karna\n\nRequirements\n- 2 saal ka experience\n\nBenefits\n- ITIL certification"}
+                  name="quickPaste"
+                  defaultValue={quickPaste}
+                  handleChange={(e) => setQuickPaste(e.target.value)}
+                />
+                <button
+                  type="button"
+                  onClick={handleAutoFill}
+                  className="mt-2 rounded-md bg-primary/10 px-4 py-2 text-sm font-medium text-primary hover:bg-primary/20"
+                >
+                  Auto-Fill Fields Below
+                </button>
+                <p className="mt-1 text-xs text-gray-500">
+                  Heading apni line pe likho (About the Role / Responsibilities / Requirements / Benefits) — neeche wale fields (jo abhi purana data dikha rahe hain) overwrite ho jayenge, save karne se pehle review kar lena.
+                </p>
+              </div>
 
-              {/* Featured Image */}
-              {/* <img
-                      src={form.pdf_url}
-                      alt="Featured"
-                      className="rounded border object-cover"
-                    /> */}
+              <TextAreaGroup
+                key={`aboutRole-${fillVersion}`}
+                label="About the Role"
+                placeholder="Role ka general description likho (paragraph mein)"
+                name="aboutRole"
+                defaultValue={contentFields.aboutRole}
+                handleChange={handleContentFieldChange}
+              />
+
+              <TextAreaGroup
+                key={`whatYoullDo-${fillVersion}`}
+                label="Key Responsibilities (har line = ek bullet point)"
+                placeholder={"User tickets resolve karna\nHardware issues troubleshoot karna\nNetwork problems handle karna"}
+                name="whatYoullDo"
+                defaultValue={contentFields.whatYoullDo}
+                handleChange={handleContentFieldChange}
+              />
+
+              <TextAreaGroup
+                key={`whatYoullBring-${fillVersion}`}
+                label="Requirements (har line = ek bullet point)"
+                placeholder={"2+ saal ka experience\nWindows aur Mac dono ka knowledge\nAchi communication skills"}
+                name="whatYoullBring"
+                defaultValue={contentFields.whatYoullBring}
+                handleChange={handleContentFieldChange}
+              />
+
+              <TextAreaGroup
+                key={`niceToHave-${fillVersion}`}
+                label="Nice to Have (har line = ek bullet point)"
+                placeholder={"ITIL certification\nNetworking background"}
+                name="niceToHave"
+                defaultValue={contentFields.niceToHave}
+                handleChange={handleContentFieldChange}
+              />
 
               <div>
                 <label className="mb-2 block font-medium">Featured Image</label>
