@@ -11,7 +11,6 @@ import { useState } from "react";
 import { useAuthStore } from "@/store/useAuthStore";
 import {
   composeJobContent,
-  parseFreeformJobText,
   EMPTY_JOB_CONTENT_FIELDS,
   JobContentFields,
 } from "@/utils/job-content-format";
@@ -31,15 +30,7 @@ export default function JobInfoFormPage() {
     published: false,
   });
   const [contentFields, setContentFields] = useState<JobContentFields>(EMPTY_JOB_CONTENT_FIELDS);
-  const [quickPaste, setQuickPaste] = useState("");
-  const [fillVersion, setFillVersion] = useState(0);
   const [loading, setLoading] = useState(false);
-
-  const handleAutoFill = () => {
-    if (!quickPaste.trim()) return;
-    setContentFields(parseFreeformJobText(quickPaste));
-    setFillVersion((v) => v + 1); // textareas ko force remount karne ke liye (defaultValue uncontrolled hai)
-  };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -130,28 +121,7 @@ export default function JobInfoFormPage() {
                 value={form.type}
               />
 
-              <div className="rounded-lg border border-dashed border-gray-400 p-4">
-                <TextAreaGroup
-                  label="Quick Paste (optional) — pura job description ek sath paste karo"
-                  placeholder={"About the Role\nHum ek IT Support Officer dhoond rahe hain...\n\nResponsibilities\n- User tickets resolve karna\n\nRequirements\n- 2 saal ka experience\n\nBenefits\n- ITIL certification"}
-                  name="quickPaste"
-                  defaultValue={quickPaste}
-                  handleChange={(e) => setQuickPaste(e.target.value)}
-                />
-                <button
-                  type="button"
-                  onClick={handleAutoFill}
-                  className="mt-2 rounded-md bg-primary/10 px-4 py-2 text-sm font-medium text-primary hover:bg-primary/20"
-                >
-                  Auto-Fill Fields Below
-                </button>
-                <p className="mt-1 text-xs text-gray-500">
-                  Heading apni line pe likho (About the Role / Responsibilities / Requirements / Benefits) — neeche wale fields overwrite ho jayenge, save karne se pehle review kar lena.
-                </p>
-              </div>
-
               <TextAreaGroup
-                key={`aboutRole-${fillVersion}`}
                 label="About the Role"
                 placeholder="Role ka general description likho (paragraph mein)"
                 name="aboutRole"
@@ -160,7 +130,6 @@ export default function JobInfoFormPage() {
               />
 
               <TextAreaGroup
-                key={`whatYoullDo-${fillVersion}`}
                 label="Key Responsibilities (har line = ek bullet point)"
                 placeholder={"User tickets resolve karna\nHardware issues troubleshoot karna\nNetwork problems handle karna"}
                 name="whatYoullDo"
@@ -169,7 +138,6 @@ export default function JobInfoFormPage() {
               />
 
               <TextAreaGroup
-                key={`whatYoullBring-${fillVersion}`}
                 label="Requirements (har line = ek bullet point)"
                 placeholder={"2+ saal ka experience\nWindows aur Mac dono ka knowledge\nAchi communication skills"}
                 name="whatYoullBring"
@@ -178,7 +146,6 @@ export default function JobInfoFormPage() {
               />
 
               <TextAreaGroup
-                key={`niceToHave-${fillVersion}`}
                 label="Nice to Have (har line = ek bullet point)"
                 placeholder={"ITIL certification\nNetworking background"}
                 name="niceToHave"
@@ -242,6 +209,15 @@ export default function JobInfoFormPage() {
                 />
                 <span>Published</span>
               </label>
+
+              {/* Additional Information — OPTIONAL, form ke end mein */}
+              <TextAreaGroup
+                label="Additional Information (optional)"
+                placeholder="Koi extra detail agar deni ho — khali bhi chhod sakte ho"
+                name="additionalInfo"
+                defaultValue={contentFields.additionalInfo}
+                handleChange={handleContentFieldChange}
+              />
 
               <button
                 type="submit"
